@@ -1,0 +1,201 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace BoGD
+{
+    public class Analytics : AnalyticsBase
+    {
+        [SerializeField]
+        private List<StaticType>    purchasesAnalitycs = new List<StaticType>() { StaticType.AnalyticsAppsFlyer };
+        [SerializeField]
+        private List<StaticType>    eventsAnalitycs = new List<StaticType>() { StaticType.AnalyticsAppMetrica };
+        [SerializeField]
+        private List<StaticType>    purchasesValidators = new List<StaticType>() { StaticType.AnalyticsAppsFlyer };
+        [SerializeField]
+        private List<StaticType>    removeDataAnalytics = new List<StaticType>() { StaticType.AnalyticsFirebase };
+        [SerializeField]
+        private bool                debug = false;
+        [SerializeField]
+        private string              appId = "IOS_APP_ID";
+        [SerializeField]
+        private string              urlRemoveData = "URL";
+
+        private List<IAnalytics>    purchasesAnalyticsInstances = new List<IAnalytics>();
+        private List<IAnalytics>    eventsAnalyticsInstances = new List<IAnalytics>();
+        private List<IAnalytics>    purchasesValidatorsInstances = new List<IAnalytics>();
+        private List<IAnalytics>    removeDataAnalyticsInstances = new List<IAnalytics>();
+
+        private Dictionary<StaticType, IAnalytics> dicts = new Dictionary<StaticType, IAnalytics>();
+
+        public override void SendBuffer()
+        {
+            base.SendBuffer();
+            foreach (var analytics in eventsAnalyticsInstances)
+            {
+                if (analytics == null)
+                {
+                    Debug.LogErrorFormat("Analytics {0} is null", analytics);
+                    continue;
+                }
+
+                analytics.SendBuffer();
+            }
+        }
+
+        private IAnalytics GetAnalytics(StaticType staticType)
+        {
+            IAnalytics res = null;
+            if (!dicts.TryGetValue(staticType, out res))
+            {
+                res = staticType.Instance<IAnalytics>();
+                if (res == null)
+                {
+                    Debug.LogErrorFormat("StaticType: {0} is NULL!", staticType);
+                }
+                dicts[staticType] = res;
+            }
+
+            return res;
+        }
+
+        private void Start()
+        {
+            if (Application.platform != RuntimePlatform.WindowsPlayer)
+            {
+                foreach (var staticType in purchasesAnalitycs)
+                {
+                    purchasesAnalyticsInstances.Add(GetAnalytics(staticType));
+                }
+
+                foreach (var staticType in eventsAnalitycs)
+                {
+                    eventsAnalyticsInstances.Add(GetAnalytics(staticType));
+                }
+
+                foreach (var staticType in purchasesValidators)
+                {
+                    purchasesValidatorsInstances.Add(GetAnalytics(staticType));
+                }
+
+                foreach (var staticType in removeDataAnalytics)
+                {
+                    removeDataAnalyticsInstances.Add(GetAnalytics(staticType));
+                }
+            }
+        }
+
+        public override bool Validate(IInAppItem item, System.Action<IInAppItem, bool> callback)
+        {
+            if (purchasesValidatorsInstances.Count == 0)
+            {
+                return true;
+            }
+
+            foreach (var analytics in purchasesValidatorsInstances)
+            {
+                if (!analytics.Validate(item, callback))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override void SendPurchase(IInAppItem item)
+        {
+            base.SendPurchase(item);
+
+            foreach (var analytics in purchasesAnalyticsInstances)
+            {
+                analytics.SendPurchase(item);
+            }
+            if (debug)
+            {
+                Debug.LogWarningFormat("Send Purchase: {0}", item.ID);
+            }
+        }
+
+        public override void SendEvent(string eventName, Dictionary<string, object> data)
+        {
+            var global = new Dictionary<string, object>();
+            //var global = GameManager.GetGlobalParameters();
+            foreach(var pair in global)
+			{
+                data[pair.Key]= pair.Value;
+			}
+
+            base.SendEvent(eventName, data);
+
+            foreach (var analytics in eventsAnalyticsInstances)
+            {
+                if (analytics == null)
+                {
+                    Debug.LogErrorFormat("Analytics {0} is null", analytics);
+                    continue;
+                }
+                analytics.SendEvent(eventName, data);
+            }
+
+            if (debug)
+            {
+                Debug.LogWarningFormat("Sent Event: {0}; Data: {1}", eventName, data.ToJSON());
+            }
+        }
+
+        public override void SendADS(string eventName, Dictionary<string, object> data)
+        {
+            base.SendADS(eventName, data);
+
+            foreach (var analytics in eventsAnalyticsInstances)
+            {
+                analytics.SendADS(eventName, data);
+            }
+        }
+
+        /// <summary>
+        /// Central solution
+        /// </summary>
+        public override void RemoveUserData()
+        {
+            var data = new Dictionary<string, string>();
+            data["event_datetime"] = ExtensionsCommon.CurrentTime().ToString();
+            data["bundle_id"] = Application.productName;
+#if UNITY_IOS
+            data["idfa"] = UnityEngine.iOS.Device.advertisingIdentifier;
+            data["idfv"] = UnityEngine.iOS.Device.vendorIdentifier;
+#endif
+            data["app_id"] = appId;
+
+            foreach(var analytics in removeDataAnalyticsInstances)
+            {
+                var addData = analytics.GetDataForRemove();
+                foreach(var pair in addData)
+                {
+                    data[pair.Key] = pair.Value;
+                }
+            }
+
+            //data["firebase_id"] = "";
+            StartCoroutine(Upload(data));
+        }
+
+        private IEnumerator Upload(Dictionary<string, string> data)
+        {
+            using (UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Post(urlRemoveData, data))
+            {
+                yield return www.SendWebRequest();
+
+                if (www.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
+                {
+                    Debug.Log(www.error);
+                }
+                else
+                {
+                    Debug.Log("Form upload complete!");
+                }
+            }
+        }
+    }
+}
