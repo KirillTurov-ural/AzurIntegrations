@@ -5,6 +5,7 @@ using System;
 
 namespace BoGD
 {
+
     public static class ExtensionsCommon
     {
         public static DateTime              epochStart = new DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
@@ -132,6 +133,59 @@ namespace BoGD
                         break;
                     }
                 }
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// Извлеччение данных из словаря
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static T Extract<T>(this Dictionary<string, object> dictionary, string key)
+        {
+            if (dictionary == null)
+            {
+                Debug.LogWarningFormat("Dictionary is null! '{0}'", key);
+                return default(T);
+            }
+
+            object obj = null;
+            if (!dictionary.TryGetValue(key, out obj))
+            {
+                Debug.LogWarningFormat("Key was not found '{0}'", key);
+                return default(T);
+            }
+
+            T result = default(T);
+            if (typeof(T).IsEnum)
+            {
+                result = (T)System.Enum.Parse(typeof(T), (string)obj, true);
+            }
+            else
+            {
+                try
+                {
+                    result = (T)obj;
+                }
+                catch
+                {
+                    Debug.LogErrorFormat("Can't convert '{0}' to format '{1}', it '{2}'", key, typeof(T), obj.GetType());
+                    return result;
+                }
+
+                //if (typeof(T).IsArray)
+                //{ 
+                //    Newtonsoft.Json.Linq.JArray array = (Newtonsoft.Json.Linq.JArray)obj;
+                //    result = array.ToObject<T>();
+                //}
+                //else
+                //{
+                //    result = (T)obj;
+                //}
             }
             return result;
         }
