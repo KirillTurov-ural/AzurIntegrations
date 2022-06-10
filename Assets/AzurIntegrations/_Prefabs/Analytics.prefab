@@ -50,7 +50,10 @@ MonoBehaviour:
   purchasesAnalitycs: ea030000
   eventsAnalitycs: eb030000
   purchasesValidators: eb030000
+  removeDataAnalytics: 
   debug: 1
+  appId: IOS_APP_ID
+  urlRemoveData: https://r5pxow34k2.execute-api.us-east-1.amazonaws.com/prod/streams/GDPR/record
 --- !u!114 &7968558384695954522
 MonoBehaviour:
   m_ObjectHideFlags: 0

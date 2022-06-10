@@ -60,7 +60,7 @@ namespace BoGD
 
         private void RemoveUserData()
         {
-
+            Analytics.RemoveUserData();
         }
 
         /// <summary>

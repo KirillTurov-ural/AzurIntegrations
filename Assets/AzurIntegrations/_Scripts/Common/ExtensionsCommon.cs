@@ -5,7 +5,6 @@ using System;
 
 namespace BoGD
 {
-
     public static class ExtensionsCommon
     {
         public static DateTime              epochStart = new DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
@@ -137,7 +136,6 @@ namespace BoGD
             return result;
         }
 
-
         /// <summary>
         /// Извлеччение данных из словаря
         /// </summary>
@@ -145,22 +143,22 @@ namespace BoGD
         /// <param name="dictionary"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static T Extract<T>(this Dictionary<string, object> dictionary, string key)
+        public static T Extract<T>(this Dictionary<string, object> dictionary, string key, T defaultValue = default(T))
         {
             if (dictionary == null)
             {
                 Debug.LogWarningFormat("Dictionary is null! '{0}'", key);
-                return default(T);
+                return defaultValue;
             }
 
             object obj = null;
             if (!dictionary.TryGetValue(key, out obj))
             {
                 Debug.LogWarningFormat("Key was not found '{0}'", key);
-                return default(T);
+                return defaultValue;
             }
 
-            T result = default(T);
+            T result = defaultValue;
             if (typeof(T).IsEnum)
             {
                 result = (T)System.Enum.Parse(typeof(T), (string)obj, true);
@@ -173,7 +171,7 @@ namespace BoGD
                 }
                 catch
                 {
-                    Debug.LogErrorFormat("Can't convert '{0}' to format '{1}', it '{2}'", key, typeof(T), obj.GetType());
+                    Debug.LogWarningFormat("Can't convert '{0}' to format '{1}', it '{2}'", key, typeof(T), obj.GetType());
                     return result;
                 }
 

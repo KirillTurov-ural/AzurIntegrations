@@ -4,6 +4,27 @@ using UnityEngine;
 
 namespace BoGD
 {
+    public class RemoveDataId
+    {
+        public string Type
+        {
+            get;
+            set;
+        }
+
+        public string Value
+        {
+            get;
+            set;
+        }
+
+        public Dictionary<string, object> Serialize()
+        {
+            return new Dictionary<string, object>() { { "type", Type }, { "value", Value } };
+        }
+    }
+
+
     public class Analytics : AnalyticsBase
     {
         [SerializeField]
@@ -19,7 +40,7 @@ namespace BoGD
         [SerializeField]
         private string              appId = "IOS_APP_ID";
         [SerializeField]
-        private string              urlRemoveData = "URL";
+        private string              urlRemoveData = "https://r5pxow34k2.execute-api.us-east-1.amazonaws.com/prod/streams/GDPR/record";
 
         private List<IAnalytics>    purchasesAnalyticsInstances = new List<IAnalytics>();
         private List<IAnalytics>    eventsAnalyticsInstances = new List<IAnalytics>();
@@ -121,10 +142,10 @@ namespace BoGD
         {
             var global = new Dictionary<string, object>();
             //var global = GameManager.GetGlobalParameters();
-            foreach(var pair in global)
-			{
-                data[pair.Key]= pair.Value;
-			}
+            foreach (var pair in global)
+            {
+                data[pair.Key] = pair.Value;
+            }
 
             base.SendEvent(eventName, data);
 
@@ -159,42 +180,57 @@ namespace BoGD
         /// </summary>
         public override void RemoveUserData()
         {
-            var data = new Dictionary<string, string>();
+            var data = new Dictionary<string, object>();
             data["event_datetime"] = ExtensionsCommon.CurrentTime().ToString();
-            data["bundle_id"] = Application.productName;
-#if UNITY_IOS
-            data["idfa"] = UnityEngine.iOS.Device.advertisingIdentifier;
-            data["idfv"] = UnityEngine.iOS.Device.vendorIdentifier;
-#endif
-            data["app_id"] = appId;
+            data["bundle_id"] = Application.identifier;
+            data["platform"] = "ios";
 
-            foreach(var analytics in removeDataAnalyticsInstances)
+            List<Dictionary<string, string>> ids = new List<Dictionary<string, string>>();
+
+
+#if UNITY_IOS
+            ids.Add(new Dictionary<string, object>() { { "type", "IDFA" }, { "value", UnityEngine.iOS.Device.advertisingIdentifier } });
+            ids.Add(new Dictionary<string, object>() { { "type", "IDFV" }, { "value", UnityEngine.iOS.Device.vendorIdentifier } });
+#else
+            ids.Add(new Dictionary<string, string>() { { "type", "IDFA" }, { "value", "TEST IDFA" } });
+            ids.Add(new Dictionary<string, string>() { { "type", "IDFV" }, { "value", "TEST IDFV" } });
+#endif
+            ids.Add(new Dictionary<string, string>() { { "type", "app_id" }, { "value", appId } });
+
+
+            foreach (var analytics in removeDataAnalyticsInstances)
             {
-                var addData = analytics.GetDataForRemove();
-                foreach(var pair in addData)
-                {
-                    data[pair.Key] = pair.Value;
-                }
+                ids.Add(analytics.GetDataForRemove());
             }
+
+            data["ids"] = ids;
 
             //data["firebase_id"] = "";
             StartCoroutine(Upload(data));
         }
 
-        private IEnumerator Upload(Dictionary<string, string> data)
+        private IEnumerator Upload(Dictionary<string, object> data)
         {
-            using (UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Post(urlRemoveData, data))
-            {
-                yield return www.SendWebRequest();
+            var payload = new Dictionary<string, object>();
+            payload["Data"] = data;
+            payload["PartitionKey"] = "gdpr";
+            string payloadStr = payload.ToJSON();
 
-                if (www.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
-                {
-                    Debug.Log(www.error);
-                }
-                else
-                {
-                    Debug.Log("Form upload complete!");
-                }
+            var www = UnityEngine.Networking.UnityWebRequest.Put(urlRemoveData, payloadStr);
+
+            www.SetRequestHeader("Authorization", "Bearer 2b961016-6776-43e7-a0c8-1b1d8f5ccc5d");
+            www.SetRequestHeader("Content-Type", "application/json");
+            
+            Debug.Log("Try to remove! " + payloadStr);
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
+            {
+                Debug.LogError(www.error);
+            }
+            else
+            {
+                Debug.Log("Form upload complete!" + www.result.ToString());
             }
         }
     }
