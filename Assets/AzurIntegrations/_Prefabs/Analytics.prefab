@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7968558384695954522}
   - component: {fileID: 4706613117821255206}
   - component: {fileID: 8658302582858472080}
+  - component: {fileID: 1323976771}
   m_Layer: 0
   m_Name: Analytics
   m_TagString: Untagged
@@ -96,3 +97,17 @@ MonoBehaviour:
   devKey: r9vNC83N8nYpCzYGigyjUh
   iOSAppId: 
   isDebug: 0
+--- !u!114 &1323976771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2096288639047740523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04c8e390d55f26e44816f1c682bd445d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroy: 1
+  sendMessagingToken: 0
