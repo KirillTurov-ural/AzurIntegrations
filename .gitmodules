@@ -1,0 +1,4 @@
+[submodule "Assets/AzurIntegrationsPackage"]
+	path = Assets/AzurIntegrationsPackage
+	url = https://github.com/KirillTurov-ural/AzurIntegrationsPackage.git
+	branch = main
