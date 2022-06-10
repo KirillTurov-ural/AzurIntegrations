@@ -47,6 +47,19 @@ namespace BoGD
             }
         }
 
+        private static IAnalytics appsFlyerAPI = null;
+        public static IAnalytics AppsFlyerAPI
+        {
+            get
+            {
+                if (appsFlyerAPI == null)
+                {
+                    appsFlyerAPI = StaticType.AnalyticsAppsFlyer.Instance<IAnalytics>();
+                }
+                return appsFlyerAPI;
+            }
+        }
+
         public static string GetUniqueID()
         {            
             return System.Guid.NewGuid().ToString();

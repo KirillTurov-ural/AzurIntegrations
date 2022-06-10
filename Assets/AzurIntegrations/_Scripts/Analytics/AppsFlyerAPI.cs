@@ -19,8 +19,6 @@ namespace BoGD
         [SerializeField]
         private bool isDebug = false;
 
-        private bool inited = false;
-
         public override StaticType StaticType
         {
             get
@@ -59,7 +57,7 @@ namespace BoGD
             //Debug.LogError("APPSFLYER TIMEOUT SET");
             AppsFlyer.startSDK();
             //Debug.LogError("APPSFLYER START SDK");
-            inited = true;
+            Inited = true;
 #endif
         }
 
@@ -84,7 +82,7 @@ namespace BoGD
             base.SendPurchase(item);
 
 #if APPSFLYER_INT
-            if (!inited)
+            if (!Inited)
             {
                 return;
             }
@@ -100,7 +98,7 @@ namespace BoGD
         public override void SendADS(string eventName, Dictionary<string, object> data)
         {
 #if APPSFLYER_INT
-            if (!inited)
+            if (!Inited)
             {
                 return;
             }

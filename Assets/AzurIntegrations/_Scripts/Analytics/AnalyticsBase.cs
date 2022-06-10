@@ -6,6 +6,12 @@ namespace BoGD
 {
     public class AnalyticsBase : StaticBehaviour, IAnalytics
     {
+        public virtual bool Inited
+        {
+            get;
+            protected set;
+        }
+
         public override StaticType StaticType => StaticType.Analytics;
 
         public virtual bool Validate(IInAppItem item, System.Action<IInAppItem, bool> callback)
@@ -43,6 +49,11 @@ namespace BoGD
 
     public interface IAnalytics : IStatic
     {
+        bool Inited
+        {
+            get;
+        }
+
         bool Validate(IInAppItem item, System.Action<IInAppItem, bool> callback);
         void SendPurchase(IInAppItem item);
         void SendEvent(string eventName, Dictionary<string, object> data);
