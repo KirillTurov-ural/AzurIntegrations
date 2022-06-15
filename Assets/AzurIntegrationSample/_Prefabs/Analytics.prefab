@@ -111,3 +111,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroy: 1
   sendMessagingToken: 0
+  getInstanceId: 1
