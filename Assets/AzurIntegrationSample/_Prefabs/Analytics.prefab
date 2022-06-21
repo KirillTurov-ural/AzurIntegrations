@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4706613117821255206}
   - component: {fileID: 8658302582858472080}
   - component: {fileID: 1323976771}
+  - component: {fileID: 172671302}
   m_Layer: 0
   m_Name: Analytics
   m_TagString: Untagged
@@ -48,10 +49,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroy: 1
-  purchasesAnalitycs: ea030000
+  purchasesAnalitycs: ea030000eb030000
   eventsAnalitycs: eb030000
   purchasesValidators: eb030000
-  removeDataAnalytics: ec030000
+  removeDataAnalytics: ec030000ea030000eb030000ed030000ee030000
   debug: 1
   appId: IOS_APP_ID
   urlRemoveData: https://r5pxow34k2.execute-api.us-east-1.amazonaws.com/prod/streams/GDPR/record
@@ -112,3 +113,16 @@ MonoBehaviour:
   dontDestroy: 1
   sendMessagingToken: 0
   getInstanceId: 1
+--- !u!114 &172671302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2096288639047740523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 850798829dceb1e4d9442d96e8f6ffb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroy: 1
