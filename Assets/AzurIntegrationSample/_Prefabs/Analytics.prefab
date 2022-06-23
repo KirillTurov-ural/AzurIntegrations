@@ -49,6 +49,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroy: 1
+  activeFlag:
+    key: int.analytics.active
+    defaultValue: 1
   purchasesAnalitycs: ea030000eb030000
   eventsAnalitycs: eb030000
   purchasesValidators: eb030000
@@ -56,6 +59,7 @@ MonoBehaviour:
   debug: 1
   appId: IOS_APP_ID
   urlRemoveData: https://r5pxow34k2.execute-api.us-east-1.amazonaws.com/prod/streams/GDPR/record
+  bearerToken: Bearer 2b961016-6776-43e7-a0c8-1b1d8f5ccc5d
 --- !u!114 &7968558384695954522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69,6 +73,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroy: 1
+  activeFlag:
+    key: int.analytics.active
+    defaultValue: 1
 --- !u!114 &4706613117821255206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,6 +89,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroy: 1
+  activeFlag:
+    key: int.analytics.active
+    defaultValue: 1
 --- !u!114 &8658302582858472080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95,6 +105,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroy: 1
+  activeFlag:
+    key: int.analytics.active
+    defaultValue: 1
   devKey: r9vNC83N8nYpCzYGigyjUh
   iOSAppId: 
   isDebug: 0
@@ -111,6 +124,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroy: 1
+  activeFlag:
+    key: int.analytics.active
+    defaultValue: 1
   sendMessagingToken: 0
   getInstanceId: 1
 --- !u!114 &172671302
@@ -126,3 +142,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroy: 1
+  activeFlag:
+    key: int.analytics.active
+    defaultValue: 1
